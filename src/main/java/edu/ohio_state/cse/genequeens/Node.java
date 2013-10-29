@@ -12,12 +12,12 @@ public final class Node {
 	/**
 	 * 
 	 */
-	private int score;
+	private final int score;
 
 	/**
 	 * 
 	 */
-	private int[] state;
+	private final int[] state;
 
 	/**
 	 * 
@@ -26,7 +26,7 @@ public final class Node {
 	 */
 	public Node(int score, int[] state) {
 		this.score = score;
-		this.state = state;
+		this.state = Arrays.copyOf(state, state.length);
 	}
 
 	/**
@@ -46,6 +46,7 @@ public final class Node {
 		return Arrays.copyOf(this.state, this.state.length);
 	}
 	
+	
 
 	@Override
 	public boolean equals(Object object) {
@@ -63,14 +64,14 @@ public final class Node {
 		}
 
 		Node nodeObject = (Node) object;
-		
-		if(this.score != nodeObject.getScore()){
+
+		if (this.score != nodeObject.getScore()) {
 			areEqual = false;
 		}
-		if(!Arrays.equals(this.state, nodeObject.getState())){
+		if (!Arrays.equals(this.state, nodeObject.getState())) {
 			areEqual = false;
 		}
-		
+
 		areEqual = this.toString().equals(nodeObject.toString());
 
 		return areEqual;

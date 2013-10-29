@@ -58,11 +58,13 @@ public class Utils {
 		 */
 		Set<Integer> attackingQueens = new HashSet<Integer>();
 
-		for (int columnA = 0; columnA < board.length - 1; columnA++) {
-			for (int columnB = columnA + 1; columnB < board.length; columnB++) {
+		int[] tempBoard = Arrays.copyOf(board, board.length);
 
-				int rowA = board[columnA];
-				int rowB = board[columnB];
+		for (int columnA = 0; columnA < tempBoard.length - 1; columnA++) {
+			for (int columnB = columnA + 1; columnB < tempBoard.length; columnB++) {
+
+				int rowA = tempBoard[columnA];
+				int rowB = tempBoard[columnB];
 
 				float slope = ((float) rowA - rowB)
 						/ ((float) columnA - columnB);
@@ -77,7 +79,7 @@ public class Utils {
 				}
 			}
 		}
-		int safeQueens = board.length - attackingQueens.size();
+		int safeQueens = tempBoard.length - attackingQueens.size();
 		return safeQueens;
 	}
 
@@ -88,24 +90,24 @@ public class Utils {
 	 */
 	public static List<Node> successors(int[] state) {
 
-		List<Node> successors = new ArrayList<Node>();
-
 		/*
 		 * Add the parent state to the list of successors to remove after all
 		 * successors are generated. This is to ensure that if a possible
 		 * successor matches the parent state, that it is not added to the list
 		 * already.
 		 */
-		int parentScore = Utils.boardScore(state);
-		Node parent = new Node(parentScore, state);
+		List<Node> successors = new ArrayList<Node>();
+		int[] stateCopy = Arrays.copyOf(state, state.length);
+		int parentScore = Utils.boardScore(stateCopy);
+		Node parent = new Node(parentScore, stateCopy);
 		successors.add(parent);
 
 		// TODO CLEANUP
 		System.out.println(successors.toString() + '\n');
 
-		for (int columnIndex = 0; columnIndex < state.length; columnIndex++) {
+		for (int columnIndex = 0; columnIndex < stateCopy.length; columnIndex++) {
 
-			int[] tempState = Arrays.copyOf(state, state.length);
+			int[] tempState = Arrays.copyOf(stateCopy, stateCopy.length);
 			System.out.println("Initial State = " + Arrays.toString(tempState));
 
 			for (int rowVal = 0; rowVal < tempState.length; rowVal++) {
@@ -113,20 +115,20 @@ public class Utils {
 				System.out.println("ColumnIndex = " + columnIndex);
 				System.out.println("\tRowValue = " + rowVal);
 
-				int[] tempTempState = Arrays.copyOf(tempState, tempState.length);
-				
-				tempTempState[columnIndex] = rowVal;
+				tempState[columnIndex] = rowVal;
 				System.out.println("\tNew State = "
 						+ Arrays.toString(tempState));
 
 				int stateScore = boardScore(tempState);
 				System.out.println("\tScore = " + stateScore);
 
-				
-				Node child = new Node(stateScore, tempTempState);
+				Node child = new Node(stateScore, tempState);
 				System.out.println("Child Rep = " + child.toString() + '\n');
 
-				// Check if the ArrayList contains the node already
+				/*
+				 * Don't add the child if another child with the same state and
+				 * score already is in the arrayList
+				 */
 				if (!successors.contains(child)) {
 					successors.add(child);
 				}
