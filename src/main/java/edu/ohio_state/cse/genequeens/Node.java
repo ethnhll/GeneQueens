@@ -12,12 +12,12 @@ public final class Node {
 	/**
 	 * 
 	 */
-	private final int score;
+	private int score;
 
 	/**
 	 * 
 	 */
-	private final int[] state;
+	private int[] state;
 
 	/**
 	 * 
@@ -70,6 +70,8 @@ public final class Node {
 		if(!Arrays.equals(this.state, nodeObject.getState())){
 			areEqual = false;
 		}
+		
+		areEqual = this.toString().equals(nodeObject.toString());
 
 		return areEqual;
 	}

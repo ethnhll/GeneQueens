@@ -14,6 +14,10 @@ public class TestHarness {
 		System.out.println(Utils.boardScore(board));
 
 		nodes = Utils.successors(board);
+		
+		for(Node node : nodes){
+			System.out.println(node);
+		}
 
 	}
 

@@ -113,14 +113,17 @@ public class Utils {
 				System.out.println("ColumnIndex = " + columnIndex);
 				System.out.println("\tRowValue = " + rowVal);
 
-				tempState[columnIndex] = rowVal;
+				int[] tempTempState = Arrays.copyOf(tempState, tempState.length);
+				
+				tempTempState[columnIndex] = rowVal;
 				System.out.println("\tNew State = "
 						+ Arrays.toString(tempState));
 
 				int stateScore = boardScore(tempState);
 				System.out.println("\tScore = " + stateScore);
 
-				Node child = new Node(stateScore, tempState);
+				
+				Node child = new Node(stateScore, tempTempState);
 				System.out.println("Child Rep = " + child.toString() + '\n');
 
 				// Check if the ArrayList contains the node already
