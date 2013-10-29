@@ -3,26 +3,34 @@ package edu.ohio_state.cse.genequeens;
 import java.util.Arrays;
 
 /**
+ * This class is intended to provide a simple, immutable structure to hold the
+ * score of a board of n-queens (the number of non-attacking queens) and the
+ * board representation to which the score corresponds.
  * 
- * @author Ethan
+ * @author Ethan Hill
  * 
  */
 public final class Node {
 
 	/**
-	 * 
+	 * the score associated with the board representation (how many attacking
+	 * queen pairs are on the board)
 	 */
 	private final int score;
 
 	/**
-	 * 
+	 * the array representation of an n-queens board layout
 	 */
 	private final int[] state;
 
 	/**
+	 * Constructs an immutable structure for a successor of a particular state,
+	 * holding the value of the passed in score and state of the n-queens board.
 	 * 
 	 * @param score
+	 *            the number of attacking queen pairs on the n-queens board
 	 * @param state
+	 *            the array representation of the n-queens board
 	 */
 	public Node(int score, int[] state) {
 		this.score = score;
@@ -30,8 +38,10 @@ public final class Node {
 	}
 
 	/**
+	 * Returns the score (number of attacking queen pairs) associated with the
+	 * board representation of {@code this}
 	 * 
-	 * @return
+	 * @return the number of non-attacking queens on the board of {@code this}
 	 */
 	public int getScore() {
 
@@ -39,14 +49,23 @@ public final class Node {
 	}
 
 	/**
+	 * Returns an array representation of an n-queens board.
 	 * 
-	 * @return
+	 * @return the state representation of a board of n-queens
 	 */
 	public int[] getState() {
 		return Arrays.copyOf(this.state, this.state.length);
 	}
-	
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.score;
+		int[] tempState = Arrays.copyOf(this.state, this.state.length);
+		result = prime * result + Arrays.hashCode(tempState);
+		return result;
+	}
 
 	@Override
 	public boolean equals(Object object) {
