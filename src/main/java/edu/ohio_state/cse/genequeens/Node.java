@@ -10,7 +10,7 @@ import java.util.Arrays;
  * @author Ethan Hill
  * 
  */
-public final class Node {
+public final class Node implements Comparable<Object> {
 
 	/**
 	 * the score associated with the board representation (how many attacking
@@ -58,16 +58,6 @@ public final class Node {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + this.score;
-		int[] tempState = Arrays.copyOf(this.state, this.state.length);
-		result = prime * result + Arrays.hashCode(tempState);
-		return result;
-	}
-
-	@Override
 	public boolean equals(Object object) {
 
 		boolean areEqual = true;
@@ -107,5 +97,25 @@ public final class Node {
 		builder.append(")");
 		return builder.toString();
 	}
+	
+	/**
+	 * Implementing {@Code Comparable}
+	 */
+	public int compareTo(Object object){
+		assert object instanceof Node : "Violated assertion: comparing Node to another Node";
+		Node node = (Node) object;
 
+		/*
+		 * We want to order the Nodes by their score, lowest to highest
+		 */
+		if (this.score > node.getScore()){
+			return 1;
+		}
+		else if (this.score < node.getScore()){
+			return -1;
+		}
+		else {
+			return 0;
+		}
+	}
 }

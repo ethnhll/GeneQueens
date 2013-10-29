@@ -1,9 +1,10 @@
 package edu.ohio_state.cse.genequeens;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * This class provides some utility functions for use in a Hill-Climbing Agent.
@@ -87,7 +88,7 @@ public class HillClimbUtils {
 	 * @param state
 	 * @return
 	 */
-	public static Set<Node> successors(int[] state) {
+	public static List<Node> successors(int[] state) {
 
 		int[] stateCopy = Arrays.copyOf(state, state.length);
 		int parentScore = HillClimbUtils.boardScore(stateCopy);
@@ -98,7 +99,7 @@ public class HillClimbUtils {
 		 * successor matches the parent state, that it is not added to the list
 		 * already.
 		 */
-		Set<Node> successors = new HashSet<Node>();
+		List<Node> successors = new ArrayList<Node>();
 		Node parent = new Node(parentScore, stateCopy);
 		successors.add(parent);
 
@@ -113,7 +114,9 @@ public class HillClimbUtils {
 				int stateScore = boardScore(tempState);
 
 				Node child = new Node(stateScore, tempState);
-				successors.add(child);
+				if (!successors.contains(child)) {
+					successors.add(child);
+				}
 			}
 		}
 		successors.remove(parent);
@@ -122,7 +125,8 @@ public class HillClimbUtils {
 
 	/**
 	 * 
-	 * @param boardSize the size of the board representation
+	 * @param boardSize
+	 *            the size of the board representation of the n-queens problem
 	 * @return
 	 */
 	public static int[] randomBoard(int boardSize) {
@@ -133,14 +137,100 @@ public class HillClimbUtils {
 
 			Random rand = new Random();
 
-			//Translates to....
-			//rand.nextInt((MAX(=boardSize-1)-MIN(=0))+1) + MIN(=0);
+			// Translates to....
+			// rand.nextInt((MAX(=boardSize-1)-MIN(=0))+1) + MIN(=0);
 			int randomVal = rand.nextInt(boardSize);
 
 			temp[columnIndex] = randomVal;
 		}
 		return temp;
-
 	}
 
+	/**
+	 * Based on a random restart Hill-Climbing Search Agent, this agent utility
+	 * finds a solution to the n-queens problem given an arbitrary boardSize
+	 * (though larger sizes will take much longer, possibly even too long to be
+	 * worthwhile to attempt, sizes > 20). Restarts the search with a random new
+	 * board state of size boardSize after encountering local minima or a
+	 * perceived plateau.
+	 * 
+	 * @param boardSize
+	 * @return a solution state representation of a board with n-queens
+	 */
+	public static int[] hillClimbingAgent(int boardSize) {
+
+		final int PLATEAU_THRESHOLD = 5;
+		int plateauCount = 0;
+		int iterationCount = 0;
+
+		boolean done = false;
+		boolean stuckFlag = false;
+
+		// Create random initial board to begin with
+		int[] initialState = HillClimbUtils.randomBoard(boardSize);
+		int initialScore = HillClimbUtils.boardScore(initialState);
+		Node currentNode = new Node(initialScore, initialState);
+
+		while (!done) {
+
+			if (stuckFlag || (plateauCount > PLATEAU_THRESHOLD)) {
+				int[] restartState = HillClimbUtils.randomBoard(boardSize);
+				int restartScore = HillClimbUtils.boardScore(restartState);
+				currentNode = new Node(restartScore, restartState);
+				plateauCount = 0;
+				stuckFlag = false;
+
+				// Alert that a random restart was needed
+				System.out.println("!!-RANDOM RESTART NEEDED-!!");
+
+			}
+
+			List<Node> nodes = HillClimbUtils
+					.successors(currentNode.getState());
+
+			/*
+			 * Sort the list according to score, and choose the best (lowest
+			 * scoring) child node
+			 */
+			Collections.sort(nodes);
+			Node nextNode = nodes.remove(0);
+
+			// Output the current state of affairs
+			System.out.println("Iteration " + iterationCount
+					+ ": Current State: "
+					+ Arrays.toString(currentNode.getState())
+					+ " Current Score: " + currentNode.getScore()
+					+ " Best Child Score: " + nextNode.getScore());
+
+			// Case where we possibly have a solution, or we are stuck
+			if (nextNode.getScore() > currentNode.getScore()) {
+				if (currentNode.getScore() == 0) {
+					System.out.println("SOLUTION FOUND");
+					done = true;
+				} else {
+					// We have reached a local minima
+					stuckFlag = true;
+				}
+			} else if (nextNode.getScore() < currentNode.getScore()) {
+				// Assign currentNode to nextNode
+				currentNode = new Node(nextNode.getScore(), nextNode.getState());
+				// Plateau trend has been broken (if there was one)
+				plateauCount = 0;
+			} else {
+				/*
+				 * Here is where we could run into a plateau, currScore ==
+				 * Nextscore. We will allow a plateau to continue on for a few
+				 * iterations before forcing a random restart.
+				 */
+
+				// Assign currentNode to nextNode
+				currentNode = new Node(nextNode.getScore(), nextNode.getState());
+				plateauCount++;
+			}
+
+			iterationCount++;
+		}
+
+		return currentNode.getState();
+	}
 }
