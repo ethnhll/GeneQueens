@@ -50,20 +50,26 @@ public final class Node {
 	@Override
 	public boolean equals(Object object) {
 
-		boolean areEqual = false;
+		boolean areEqual = true;
 
 		if (object == null) {
 			areEqual = false;
 		}
-		if (object == this) {
-			areEqual = true;
+		if (object != this) {
+			areEqual = false;
 		}
 		if (!(object instanceof Node)) {
 			areEqual = false;
 		}
 
 		Node nodeObject = (Node) object;
-		areEqual = this.toString().equals(nodeObject.toString());
+		
+		if(this.score != nodeObject.getScore()){
+			areEqual = false;
+		}
+		if(!Arrays.equals(this.state, nodeObject.getState())){
+			areEqual = false;
+		}
 
 		return areEqual;
 	}
