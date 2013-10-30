@@ -1,5 +1,7 @@
 package edu.ohio_state.cse.genequeens;
 
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -122,12 +124,13 @@ public class HillClimbUtils {
 		successors.remove(parent);
 		return successors;
 	}
-
+	
 	/**
+	 * Creates a full board with queens positioned randomly across the board.
 	 * 
 	 * @param boardSize
 	 *            the size of the board representation of the n-queens problem
-	 * @return
+	 * @return a randomBoard filled with queens at random positions
 	 */
 	public static int[] randomBoard(int boardSize) {
 
@@ -154,7 +157,7 @@ public class HillClimbUtils {
 	 * board state of size boardSize after encountering local minima or a
 	 * perceived plateau.
 	 * 
-	 * @param boardSize
+	 * @param boardSize the size of the representation of a 
 	 * @return a solution state representation of a board with n-queens
 	 */
 	public static int[] hillClimbingAgent(int boardSize) {

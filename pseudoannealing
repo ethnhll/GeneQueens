@@ -1,0 +1,25 @@
+simulatedAnnealingAgent(int boardsize, int? schedule){
+
+
+current = make node(random initial state)
+
+for (i to infinity)
+{
+	temperature = schedule
+	if (temperature = 0){
+		return current
+	}
+	next = randomly select from successors
+	deltaE = next.Value - current.Value
+	if (deltaE > 0)
+	{
+		current = next
+	}
+	else {
+		current =  next only with probability e^(deltaE/T)
+	}
+	
+
+}
+
+

@@ -1,11 +1,13 @@
 package edu.ohio_state.cse.genequeens;
 
+
+
 import java.util.Arrays;
 
 /**
  * This class is intended to provide a simple, immutable structure to hold the
- * score of a board of n-queens (the number of non-attacking queens) and the
- * board representation to which the score corresponds.
+ * score of a board of n-queens (related to the number of non-attacking queens)
+ * and the board representation to which the score corresponds.
  * 
  * @author Ethan Hill
  * 
@@ -13,8 +15,8 @@ import java.util.Arrays;
 public final class Node implements Comparable<Object> {
 
 	/**
-	 * the score associated with the board representation (how many attacking
-	 * queen pairs are on the board)
+	 * the score associated with the board representation (related to how many
+	 * attacking queen pairs are on the board)
 	 */
 	private final int score;
 
@@ -28,7 +30,8 @@ public final class Node implements Comparable<Object> {
 	 * holding the value of the passed in score and state of the n-queens board.
 	 * 
 	 * @param score
-	 *            the number of attacking queen pairs on the n-queens board
+	 *            score related to the number of attacking queen pairs on the
+	 *            n-queens board
 	 * @param state
 	 *            the array representation of the n-queens board
 	 */
@@ -38,8 +41,8 @@ public final class Node implements Comparable<Object> {
 	}
 
 	/**
-	 * Returns the score (number of attacking queen pairs) associated with the
-	 * board representation of {@code this}
+	 * Returns the score (related to the number of attacking queen pairs)
+	 * associated with the board representation of {@code this}
 	 * 
 	 * @return the number of non-attacking queens on the board of {@code this}
 	 */
@@ -97,24 +100,22 @@ public final class Node implements Comparable<Object> {
 		builder.append(")");
 		return builder.toString();
 	}
-	
+
 	/**
 	 * Implementing {@Code Comparable}
 	 */
-	public int compareTo(Object object){
+	public int compareTo(Object object) {
 		assert object instanceof Node : "Violated assertion: comparing Node to another Node";
 		Node node = (Node) object;
 
 		/*
 		 * We want to order the Nodes by their score, lowest to highest
 		 */
-		if (this.score > node.getScore()){
+		if (this.score > node.getScore()) {
 			return 1;
-		}
-		else if (this.score < node.getScore()){
+		} else if (this.score < node.getScore()) {
 			return -1;
-		}
-		else {
+		} else {
 			return 0;
 		}
 	}
