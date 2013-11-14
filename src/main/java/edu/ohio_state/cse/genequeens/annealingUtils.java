@@ -69,7 +69,7 @@ public class annealingUtils {
 	 */
 	public static int[] randomBoard(int boardSize) {
 
-		int[] temp = new int[boardSize];
+		int[] randBoard = new int[boardSize];
 
 		for (int columnIndex = 0; columnIndex < boardSize; columnIndex++) {
 
@@ -79,9 +79,9 @@ public class annealingUtils {
 			// rand.nextInt((MAX(=boardSize-1)-MIN(=0))+1) + MIN(=0);
 			int randomVal = rand.nextInt(boardSize);
 
-			temp[columnIndex] = randomVal;
+			randBoard[columnIndex] = randomVal;
 		}
-		return temp;
+		return randBoard;
 	}
 
 	/**
@@ -134,47 +134,60 @@ public class annealingUtils {
 		return successors;
 	}
 
-	public static int[] simulatedAnnealingAgent(int boardSize, int schedule) {
+	/**
+	 * 
+	 * @param boardSize
+	 * @param temperature
+	 * @return
+	 */
+	public static int[] simulatedAnnealingAgent(int boardSize, int temperature) {
 
-		/*
-		 * No definition for what is a good temperature. I use 100 simply
-		 * because that is the boiling point of water (an arbitrary choice). I
-		 * also use this because I implement the schedule as geometric cooling.
-		 */
-		final int INITIAL_TEMPERATURE = 100;
-		double temperature = (double) (INITIAL_TEMPERATURE);
-		boolean done = false;
-
-		int[] solution = new int[boardSize];
-		
-		int[]  initialState = randomBoard(boardSize);
+		// Create a random initial parent Node
+		int[] initialState = randomBoard(boardSize);
 		int initialScore = boardScore(initialState);
 		Node current = new Node(initialScore, initialState);
-		
-		List<Node> successors = successors(initialState);
-		
-		while (!done && (temperature > 0d)){
-			
-			temperature 
-			
-			if (temperature == 0d){
-				done = true;
-				solution = Arrays.copyOf(current.getState(), current.getState().length);
-			}
-			
-			int randomPosition = new Random().nextInt(successors.size());
-			Node next = successors.remove(randomPosition);
-			
-			int deltaE = next.getScore() - current.getScore();
-			if (deltaE > 0){
-				current = new Node(next.getScore(), next.getState());
-			}
-			else {
-				
-			}
-		}
-		
 
-		return solution;
+		while (boardScore(current.getState()) != 0) {
+			/*
+			 * No definition for what is a good temperature. I use 100 simply
+			 * because that is the boiling point of water (an arbitrary choice).
+			 * I also use this because I implement the schedule as geometric
+			 * cooling.
+			 */
+			double currentTemperature = (double) (temperature * boardSize);
+			boolean done = false;
+			int iterations = 1;
+
+			while (!done) {
+				
+				currentTemperature = currentTemperature / (double) iterations ;
+				// Output the current state of affairs
+				System.out.println("Iteration " + iterations
+						+ ": Current State: "
+						+ Arrays.toString(current.getState())
+						+ " Current Score: " + current.getScore() + " Current Temperature: " + currentTemperature);
+
+				if (Math.round(currentTemperature) ==  0) {
+					done = true;
+				}
+				List<Node> successors = successors(current.getState());
+				int randomChildPos = new Random().nextInt(successors.size());
+				Node next = successors.remove(randomChildPos);
+				int deltaE = next.getScore() - current.getScore();
+				// We are using less than 0 because a lower score is better
+				if (deltaE < 0) {
+					current = next;
+				} else {
+					double rand = new Random().nextDouble();
+					if (rand < Math.exp(-((double) deltaE / currentTemperature))) {
+						current = next;
+					}
+				}
+				iterations++;
+			}
+
+		}
+		System.out.println("SOLUTION FOUND");
+		return current.getState();
 	}
 }

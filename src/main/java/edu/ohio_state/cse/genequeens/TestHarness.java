@@ -77,7 +77,35 @@ public class TestHarness {
 
 		}
 
-		else {
+		else if (args.length == 2) {
+			int commandBoardSize = Integer.parseInt(args[0]);
+			int commandTemperature = Integer.parseInt(args[1]);
+
+			// Check if input is valid
+			if ((commandBoardSize >= 4) && (commandTemperature > 0)) {
+				System.out
+						.println("--------------------------------------------------------------------------------");
+				System.out.println("\t\tSIMULATED ANNEALING SEARCH");
+				System.out
+						.println("--------------------------------------------------------------------------------");
+				int[] solution = annealingUtils.simulatedAnnealingAgent(
+						commandBoardSize, commandTemperature);
+
+				for (int columnIndex = 0; columnIndex < solution.length; columnIndex++) {
+					System.out.println("Queen" + (columnIndex + 1) + ": Row "
+							+ solution[columnIndex] + " Column " + columnIndex);
+				}
+				System.out
+						.println("--------------------------------------------------------------------------------");
+			} else {
+				System.out
+						.println("Please restart the program and enter valid boardSize (greater than or equal to 4),"
+								+ "\nand temperature (greater than 0)");
+				System.out
+						.println("--------------------------------------------------------------------------------");
+				System.exit(0);
+			}
+		} else {
 			System.out
 					.println("Please restart the program and enter valid input");
 			System.out
