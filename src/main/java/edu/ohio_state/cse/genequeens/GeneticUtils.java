@@ -231,7 +231,7 @@ public class GeneticUtils {
 		List<Node> population = new ArrayList<Node>();
 
 		int noImprovementCounter = 0;
-		final int NO_IMPROVEMENT_PLATEAU = 10*populationSize;
+		final int NO_IMPROVEMENT_PLATEAU = 10 * populationSize;
 		boolean restartFlag = false;
 		boolean done = false;
 
@@ -241,7 +241,6 @@ public class GeneticUtils {
 		int[] solution = new int[boardSize];
 		int iterations = 0;
 
-		
 		while (!done) {
 
 			int populationFitness = 0;
@@ -271,12 +270,12 @@ public class GeneticUtils {
 
 				// Now sort the list by fitness
 				Collections.sort(population);
-				// Examine the population's most fit individual, the last in the list
-				Node mostFit = population.get(populationSize -1);
+				// Examine the population's most fit individual, the last in the
+				// list
+				Node mostFit = population.get(populationSize - 1);
 				int mostFitRank = (mostFit.getScore() / populationFitness) * 100;
 				// Now we examine this rank to see if the population is
-				// improving
-				// over time
+				// improving over time
 				if (mostFitRank <= prevMostFitRank) {
 					noImprovementCounter++;
 				} else {

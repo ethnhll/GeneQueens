@@ -1,7 +1,5 @@
 package edu.ohio_state.cse.genequeens;
 
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -88,7 +86,8 @@ public class HillClimbUtils {
 	 * </p>
 	 * 
 	 * @param state
-	 * @return
+	 *            the initial state to generate successors from
+	 * @return a list of successor nodes generated from the initial state
 	 */
 	public static List<Node> successors(int[] state) {
 
@@ -124,7 +123,7 @@ public class HillClimbUtils {
 		successors.remove(parent);
 		return successors;
 	}
-	
+
 	/**
 	 * Creates a full board with queens positioned randomly across the board.
 	 * 
@@ -157,7 +156,8 @@ public class HillClimbUtils {
 	 * board state of size boardSize after encountering local minima or a
 	 * perceived plateau.
 	 * 
-	 * @param boardSize the size of the representation of a 
+	 * @param boardSize
+	 *            the size of the representation of a
 	 * @return a solution state representation of a board with n-queens
 	 */
 	public static int[] hillClimbingAgent(int boardSize) {
