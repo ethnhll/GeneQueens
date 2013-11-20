@@ -162,7 +162,7 @@ public class HillClimbUtils {
 	 */
 	public static int[] hillClimbingAgent(int boardSize) {
 
-		final int PLATEAU_THRESHOLD = 5;
+		final int PLATEAU_THRESHOLD = boardSize;
 		int plateauCount = 0;
 		int iterationCount = 0;
 

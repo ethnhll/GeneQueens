@@ -88,7 +88,7 @@ public class TestHarness {
 				System.out.println("\t\tSIMULATED ANNEALING SEARCH");
 				System.out
 						.println("--------------------------------------------------------------------------------");
-				int[] solution = annealingUtils.simulatedAnnealingAgent(
+				int[] solution = AnnealingUtils.simulatedAnnealingAgent(
 						commandBoardSize, commandTemperature);
 
 				for (int columnIndex = 0; columnIndex < solution.length; columnIndex++) {

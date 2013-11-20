@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-public class annealingUtils {
+public class AnnealingUtils {
 
 	/**
 	 * Returns a count of queen pairs that are able to be attacked (unsafe
@@ -147,6 +147,8 @@ public class annealingUtils {
 		int initialScore = boardScore(initialState);
 		Node current = new Node(initialScore, initialState);
 
+		double currentTemperature = (double) (temperature);
+
 		while (boardScore(current.getState()) != 0) {
 			/*
 			 * No definition for what is a good temperature. I use 100 simply
@@ -154,32 +156,36 @@ public class annealingUtils {
 			 * I also use this because I implement the schedule as geometric
 			 * cooling.
 			 */
-			double currentTemperature = (double) (temperature * boardSize);
+
 			boolean done = false;
 			int iterations = 1;
 
 			while (!done) {
-				
-				currentTemperature = currentTemperature / (double) iterations ;
+				// Using Newton's Law of Cooling
+				currentTemperature = currentTemperature
+						* Math.exp(-((double) boardSize * iterations));
 				// Output the current state of affairs
 				System.out.println("Iteration " + iterations
 						+ ": Current State: "
 						+ Arrays.toString(current.getState())
-						+ " Current Score: " + current.getScore() + " Current Temperature: " + currentTemperature);
+						+ " Current Score: " + current.getScore()
+						+ " Current Temperature: " + currentTemperature);
 
-				if (Math.round(currentTemperature) ==  0) {
+				if (currentTemperature < 0.0000001) {
 					done = true;
 				}
 				List<Node> successors = successors(current.getState());
 				int randomChildPos = new Random().nextInt(successors.size());
 				Node next = successors.remove(randomChildPos);
+
 				int deltaE = next.getScore() - current.getScore();
 				// We are using less than 0 because a lower score is better
-				if (deltaE < 0) {
+				if (deltaE <= 0) {
 					current = next;
 				} else {
 					double rand = new Random().nextDouble();
-					if (rand < Math.exp(-((double) deltaE / currentTemperature))) {
+					if (rand < Math
+							.exp(-((double) deltaE / currentTemperature))) {
 						current = next;
 					}
 				}
