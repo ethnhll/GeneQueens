@@ -93,6 +93,7 @@ public final class Node implements Comparable<Object> {
 	public String toString() {
 
 		StringBuilder builder = new StringBuilder();
+		
 		builder.append("(");
 		builder.append(this.score);
 		builder.append(", ");
