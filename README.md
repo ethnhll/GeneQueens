@@ -30,6 +30,16 @@ Unfortunately, at the moment this application needs a bit of work. This section
 will be updated in a couple of days.
 
 
+Eclipse
+-------
+
+This project was developed in [Eclipse](http://www.eclipse.org) (specifically 
+version 4.4 Luna) and can be imported as an Eclipse in a number of ways. If you
+have git integrated with your Eclipse environment, you can simply clone the 
+repository through your favorite git tool and import the project as an existing 
+project.
+
+
 Version
 ----
 
