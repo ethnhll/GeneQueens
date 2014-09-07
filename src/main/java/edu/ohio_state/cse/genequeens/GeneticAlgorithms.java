@@ -53,7 +53,8 @@ public class GeneticAlgorithms {
 	 *            The population from which the most fit individual is selected.
 	 * @return An instance of the most fit individual from {@code population}.
 	 */
-	public static Evolvable findMostFitIndividual(Collection<Evolvable> population) {
+	public static Evolvable findMostFitIndividual(
+			Collection<Evolvable> population) {
 		assert !population.isEmpty() : "population is empty";
 
 		List<Evolvable> list = new ArrayList<Evolvable>(population);
@@ -81,14 +82,15 @@ public class GeneticAlgorithms {
 	 * @param mutationRate
 	 *            The probability at which a mutation is applied to the genes of
 	 *            individuals in {@code population} after genetic exchange.
-	 * @return A collection of {@code Evovlable} individuals generated from
+	 *            Behavior is not well defined for mutation rates of zero or
+	 *            less.
+	 * @return A collection of {@code Evovlable}s generated from
 	 *         {@code population}.
 	 */
 	public static Collection<Evolvable> createNextGeneration(
 			Collection<Evolvable> population,
 			MateSelector<Evolvable> mateSelector, double mutationRate) {
 		assert !population.isEmpty() : "population is empty";
-		assert mutationRate > 0.0d : "mutationRate is 0.0";
 
 		Collection<Evolvable> nextGeneration = new ArrayList<Evolvable>();
 		List<Evolvable> listCopy = new ArrayList<Evolvable>(population);
@@ -240,8 +242,8 @@ public class GeneticAlgorithms {
 	 * @return A collection of of n-best individuals that result from this
 	 *         implementation of a genetic algorithm.
 	 */
-	public static Collection<Evolvable> evolve(Collection<Evolvable> population,
-			int maxGenerations) {
+	public static Collection<Evolvable> evolve(
+			Collection<Evolvable> population, int maxGenerations) {
 		// Snapshot of best seen population
 		Collection<Evolvable> populationSnapshot = population;
 
@@ -387,5 +389,68 @@ public class GeneticAlgorithms {
 			generationCount++;
 		}
 		return populationSnapshot;
+	}
+
+	/**
+	 * Applies the genetic algorithm to a population of
+	 * {@link edu.ohio_state.cse.genequeens.Evolvable Evolvable} individuals,
+	 * producing a solution to the problem at hand (dependent on the
+	 * implementation of the
+	 * {@link edu.ohio_state.cse.genequeens.EvolutionaryGoal goal}).
+	 * 
+	 * @param population
+	 *            The population from which a solution is drawn by this method.
+	 * @param goal
+	 *            The problem-specific implementation of an
+	 *            {@code EvolutionaryGoal} which verifies whether the population
+	 *            satisfies some requirements to be considered a solution to a
+	 *            problem.
+	 * @return A collection of of n-best individuals that result from this
+	 *         implementation of a genetic algorithm.
+	 */
+	public static Collection<Evolvable> evolve(
+			Collection<Evolvable> population, EvolutionaryGoal goal) {
+		evaluatePopulation(population);
+		while (!goal.isSatisfied(population)) {
+			population = createNextGeneration(population,
+					new SemiStochasticMostFitSelector(), MUTATION_RATE_DEJONG);
+			evaluatePopulation(population);
+		}
+		return population;
+	}
+
+	/**
+	 * Applies the genetic algorithm to a population of
+	 * {@link edu.ohio_state.cse.genequeens.Evolvable Evolvable} individuals,
+	 * producing a solution to the problem at hand (dependent on the
+	 * implementation of the
+	 * {@link edu.ohio_state.cse.genequeens.EvolutionaryGoal goal}). There is a
+	 * specified mutation rate, a probability that the genetic sequence of an
+	 * individual is mutated after genetic exchange.
+	 * 
+	 * @param population
+	 *            The population from which a solution is drawn by this method.
+	 * @param mutationRate
+	 *            The probability that the genetic sequence of an
+	 *            {@code Evolvable} individual gets mutated after genetic
+	 *            exchange with a mate.
+	 * @param goal
+	 *            The problem-specific implementation of an
+	 *            {@code EvolutionaryGoal} which verifies whether the population
+	 *            satisfies some requirements to be considered a solution to a
+	 *            problem.
+	 * @return A collection of of n-best individuals that result from this
+	 *         implementation of a genetic algorithm.
+	 */
+	public static Collection<Evolvable> evolve(
+			Collection<Evolvable> population, double mutationRate,
+			EvolutionaryGoal goal) {
+		evaluatePopulation(population);
+		while (!goal.isSatisfied(population)) {
+			population = createNextGeneration(population,
+					new SemiStochasticMostFitSelector(), mutationRate);
+			evaluatePopulation(population);
+		}
+		return population;
 	}
 }

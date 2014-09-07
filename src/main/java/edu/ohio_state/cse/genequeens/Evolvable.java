@@ -1,11 +1,17 @@
 package edu.ohio_state.cse.genequeens;
 
 /**
- * This interface dictates the expected behavior of classes that will be used in
- * {@link edu.ohio_state.cse.genequeens.GeneticAlgorithms GeneticAlgorithms}.
- * Every implementation of these methods will be very problem-dependent and may
- * require further extension in the event that the behavior noted here is not
- * sufficient to meet some use-case.
+ * {@code Evolvable}s are classes that represent an individual with a genetic
+ * sequence, the ability to exchange genes with other {@code Evolvable}s of the
+ * same class, and mutate their own genetic sequence.
+ * <p>
+ * {@code Evolvable}s are used in conjunction with
+ * {@link edu.ohio_state.cse.genequeens.GeneticAlgorithms GeneticAlgorithms} to
+ * solve a particular problem defined by the implementation of the sub-classing
+ * {@code Evolvable}. Every implementation of these methods will be very
+ * problem-dependent and may require further extension in the event that the
+ * behavior noted here is not sufficient to meet some use-case.
+ * </p>
  * 
  * @author Ethan Hill
  * @see GeneticAlgorithms
@@ -58,6 +64,8 @@ public abstract class Evolvable implements Comparable<Evolvable> {
 	 * implementer.
 	 * 
 	 * @param mutationRate
+	 *            The probability that a mutation occurs in the genetic sequence
+	 *            of {@code this}.
 	 */
 	public abstract void mutate(double mutationRate);
 
@@ -65,6 +73,8 @@ public abstract class Evolvable implements Comparable<Evolvable> {
 	 * An instance of {@code this} selects a point (or points depending on the
 	 * choice of implementation) at which its genetic sequence is split and
 	 * crossed over with the genetic sequence of {@code mate}.
+	 * <p>
+	 * {@code mate} must be an instance of the same class as {@code this}.
 	 * 
 	 * @param mate
 	 *            The {@code Evolvable} mate for {@code this} with which

@@ -99,7 +99,7 @@ public class AnnealingUtils {
 	 *            the initial state to generate successors from
 	 * @return a list of successor nodes generated from the initial state
 	 */
-	public static List<Node> successors(int[] state) {
+	public static List<ChessBoard> successors(int[] state) {
 
 		int[] stateCopy = Arrays.copyOf(state, state.length);
 		int parentScore = HillClimbUtils.boardScore(stateCopy);
@@ -110,8 +110,8 @@ public class AnnealingUtils {
 		 * successor matches the parent state, that it is not added to the list
 		 * already.
 		 */
-		List<Node> successors = new ArrayList<Node>();
-		Node parent = new Node(parentScore, stateCopy);
+		List<ChessBoard> successors = new ArrayList<ChessBoard>();
+		ChessBoard parent = new ChessBoard(parentScore, stateCopy);
 		successors.add(parent);
 
 		for (int columnIndex = 0; columnIndex < stateCopy.length; columnIndex++) {
@@ -124,7 +124,7 @@ public class AnnealingUtils {
 
 				int stateScore = boardScore(tempState);
 
-				Node child = new Node(stateScore, tempState);
+				ChessBoard child = new ChessBoard(stateScore, tempState);
 				if (!successors.contains(child)) {
 					successors.add(child);
 				}
@@ -145,11 +145,11 @@ public class AnnealingUtils {
 		// Create a random initial parent Node
 		int[] initialState = randomBoard(boardSize);
 		int initialScore = boardScore(initialState);
-		Node current = new Node(initialScore, initialState);
+		ChessBoard current = new ChessBoard(initialScore, initialState);
 
 		double currentTemperature = (double) (temperature);
 
-		while (boardScore(current.getState()) != 0) {
+		while (boardScore(current.getBoardLayout()) != 0) {
 			/*
 			 * No definition for what is a good temperature. I use 100 simply
 			 * because that is the boiling point of water (an arbitrary choice).
@@ -167,16 +167,16 @@ public class AnnealingUtils {
 				// Output the current state of affairs
 				System.out.println("Iteration " + iterations
 						+ ": Current State: "
-						+ Arrays.toString(current.getState())
+						+ Arrays.toString(current.getBoardLayout())
 						+ " Current Score: " + current.getScore()
 						+ " Current Temperature: " + currentTemperature);
 
 				if (currentTemperature < 0.0000001) {
 					done = true;
 				}
-				List<Node> successors = successors(current.getState());
+				List<ChessBoard> successors = successors(current.getBoardLayout());
 				int randomChildPos = new Random().nextInt(successors.size());
-				Node next = successors.remove(randomChildPos);
+				ChessBoard next = successors.remove(randomChildPos);
 
 				int deltaE = next.getScore() - current.getScore();
 				// We are using less than 0 because a lower score is better
@@ -194,6 +194,6 @@ public class AnnealingUtils {
 
 		}
 		System.out.println("SOLUTION FOUND");
-		return current.getState();
+		return current.getBoardLayout();
 	}
 }

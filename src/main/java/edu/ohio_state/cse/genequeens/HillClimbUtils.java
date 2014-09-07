@@ -89,7 +89,7 @@ public class HillClimbUtils {
 	 *            the initial state to generate successors from
 	 * @return a list of successor nodes generated from the initial state
 	 */
-	public static List<Node> successors(int[] state) {
+	public static List<ChessBoard> successors(int[] state) {
 
 		int[] stateCopy = Arrays.copyOf(state, state.length);
 		int parentScore = HillClimbUtils.boardScore(stateCopy);
@@ -100,8 +100,8 @@ public class HillClimbUtils {
 		 * successor matches the parent state, that it is not added to the list
 		 * already.
 		 */
-		List<Node> successors = new ArrayList<Node>();
-		Node parent = new Node(parentScore, stateCopy);
+		List<ChessBoard> successors = new ArrayList<ChessBoard>();
+		ChessBoard parent = new ChessBoard(parentScore, stateCopy);
 		successors.add(parent);
 
 		for (int columnIndex = 0; columnIndex < stateCopy.length; columnIndex++) {
@@ -114,7 +114,7 @@ public class HillClimbUtils {
 
 				int stateScore = boardScore(tempState);
 
-				Node child = new Node(stateScore, tempState);
+				ChessBoard child = new ChessBoard(stateScore, tempState);
 				if (!successors.contains(child)) {
 					successors.add(child);
 				}
@@ -172,14 +172,14 @@ public class HillClimbUtils {
 		// Create random initial board to begin with
 		int[] initialState = HillClimbUtils.randomBoard(boardSize);
 		int initialScore = HillClimbUtils.boardScore(initialState);
-		Node currentNode = new Node(initialScore, initialState);
+		ChessBoard currentNode = new ChessBoard(initialScore, initialState);
 
 		while (!done) {
 
 			if (stuckFlag || (plateauCount > PLATEAU_THRESHOLD)) {
 				int[] restartState = HillClimbUtils.randomBoard(boardSize);
 				int restartScore = HillClimbUtils.boardScore(restartState);
-				currentNode = new Node(restartScore, restartState);
+				currentNode = new ChessBoard(restartScore, restartState);
 				plateauCount = 0;
 				stuckFlag = false;
 
@@ -188,20 +188,20 @@ public class HillClimbUtils {
 
 			}
 
-			List<Node> nodes = HillClimbUtils
-					.successors(currentNode.getState());
+			List<ChessBoard> nodes = HillClimbUtils
+					.successors(currentNode.getBoardLayout());
 
 			/*
 			 * Sort the list according to score, and choose the best (lowest
 			 * scoring) child node
 			 */
 			Collections.sort(nodes);
-			Node nextNode = nodes.remove(0);
+			ChessBoard nextNode = nodes.remove(0);
 
 			// Output the current state of affairs
 			System.out.println("Iteration " + iterationCount
 					+ ": Current State: "
-					+ Arrays.toString(currentNode.getState())
+					+ Arrays.toString(currentNode.getBoardLayout())
 					+ " Current Score: " + currentNode.getScore()
 					+ " Best Child Score: " + nextNode.getScore());
 
@@ -216,7 +216,7 @@ public class HillClimbUtils {
 				}
 			} else if (nextNode.getScore() < currentNode.getScore()) {
 				// Assign currentNode to nextNode
-				currentNode = new Node(nextNode.getScore(), nextNode.getState());
+				currentNode = new ChessBoard(nextNode.getScore(), nextNode.getBoardLayout());
 				// Plateau trend has been broken (if there was one)
 				plateauCount = 0;
 			} else {
@@ -227,13 +227,13 @@ public class HillClimbUtils {
 				 */
 
 				// Assign currentNode to nextNode
-				currentNode = new Node(nextNode.getScore(), nextNode.getState());
+				currentNode = new ChessBoard(nextNode.getScore(), nextNode.getBoardLayout());
 				plateauCount++;
 			}
 
 			iterationCount++;
 		}
 
-		return currentNode.getState();
+		return currentNode.getBoardLayout();
 	}
 }

@@ -44,18 +44,6 @@ public class GeneticUtils {
 		int[] parentA = Arrays.copyOf(childA, childA.length);
 		int[] parentB = Arrays.copyOf(childB, childB.length);
 
-		/*
-		 * Generate a random number to determine the crossover point. We are
-		 * going to deterministically say that the left side of the crossover
-		 * point will come from parentA and the right side of the crossover
-		 * point will come from parentB.
-		 * 
-		 * Max is the length of a parent-1, however nextInt is also exclusive of
-		 * top bound, so closer to parent-2. This guarantees that at least one
-		 * "gene" will be transferred from a parent to the child.
-		 */
-		int crossOverIndex = new Random().nextInt(parentA.length - 1);
-
 		// Fill the child array with the right side of crossover point from
 		// parentA
 		for (int i = 0; i < crossOverIndex; i++) {
@@ -109,21 +97,6 @@ public class GeneticUtils {
 	}
 
 	/**
-	 * Simple utility method that calculates a factorial.
-	 * 
-	 * @param n
-	 *            the number to take the factorial of
-	 * @return the result factorial (@Code n!)
-	 */
-	public static double factorial(int n) {
-		double result = 1d;
-		for (int i = 1; i <= n; i++) {
-			result = result * i;
-		}
-		return result;
-	}
-
-	/**
 	 * Returns a count of queen pairs that are able to be attacked (unsafe
 	 * queens) on an n x n board, where a single queen occupies a column on the
 	 * board.
@@ -134,55 +107,7 @@ public class GeneticUtils {
 	 * @return the number of attacking queen pairs ton the board (these queens
 	 *         are unsafe)
 	 */
-	public static int boardScore(int[] board) {
-
-		/*
-		 * Because the code below is not entirely intuitive, here is a
-		 * (hopefully) helpful pre-amble to what is going on.
-		 * 
-		 * A queen may be attacked by another queen occupying the same diagonal,
-		 * vertical or horizontal positions on the board, however, because the
-		 * board is represented as an integer array, no two queens will occupy
-		 * the same column, therefore we no longer need to consider a queen
-		 * being attacked vertically. To consider the other cases where a queen
-		 * may be attacked, we examine two queens on a board (iteratively, we
-		 * are examining every queen against every other queen) by calculating
-		 * the "slope" between the two queens.
-		 * 
-		 * Treating the positions of the queens on the board as coordinates in
-		 * an xy plane (ex. queen1 exists in (0,1) or the first column, second
-		 * row), we can deduce that two queens having a slope of 1, -1, or 0 are
-		 * attacking one another. We then simply count how many attacking queen
-		 * pairs we observe.
-		 */
-
-		int attackingQueenPairCount = 0;
-		int[] tempBoard = Arrays.copyOf(board, board.length);
-
-		for (int columnA = 0; columnA < tempBoard.length - 1; columnA++) {
-			for (int columnB = columnA + 1; columnB < tempBoard.length; columnB++) {
-
-				int rowA = tempBoard[columnA];
-				int rowB = tempBoard[columnB];
-
-				float slope = ((float) rowA - rowB)
-						/ ((float) columnA - columnB);
-
-				if ((Math.abs(slope) == 1F) || slope == 0F) {
-					attackingQueenPairCount++;
-				}
-			}
-		}
-
-		/*
-		 * We need to now subtract this number of attacking pairs from the total
-		 * number of queen pairs, which is n choose 2. Or n!/(2!*(n-2)!)
-		 */
-		int nChooseTwo = (int) ((factorial(tempBoard.length)) / (factorial(2) * factorial(tempBoard.length - 2)));
-
-		return nChooseTwo - attackingQueenPairCount;
-
-	}
+	
 
 	/**
 	 * Creates a full board with queens positioned randomly across the board.
@@ -228,7 +153,7 @@ public class GeneticUtils {
 
 		// Calculate the max fitness
 		int maxFitness = (int) ((factorial(boardSize)) / ((factorial(2) * factorial(boardSize - 2))));
-		List<Node> population = new ArrayList<Node>();
+		List<ChessBoard> population = new ArrayList<ChessBoard>();
 
 		int noImprovementCounter = 0;
 		final int NO_IMPROVEMENT_PLATEAU = 10 * populationSize;
@@ -259,7 +184,7 @@ public class GeneticUtils {
 				int[] randBoard = GeneticUtils.randomBoard(boardSize);
 				int individualScore = GeneticUtils.boardScore(randBoard);
 
-				Node individual = new Node(individualScore, randBoard);
+				ChessBoard individual = new ChessBoard(individualScore, randBoard);
 				population.add(individual);
 				populationFitness += individualScore;
 				restartFlag = false;
@@ -272,7 +197,7 @@ public class GeneticUtils {
 				Collections.sort(population);
 				// Examine the population's most fit individual, the last in the
 				// list
-				Node mostFit = population.get(populationSize - 1);
+				ChessBoard mostFit = population.get(populationSize - 1);
 				int mostFitRank = (mostFit.getScore() / populationFitness) * 100;
 				// Now we examine this rank to see if the population is
 				// improving over time
@@ -293,22 +218,22 @@ public class GeneticUtils {
 				// Output the current state of affairs
 				System.out.println("Iteration " + iterations
 						+ ": Most Fit Individual: "
-						+ Arrays.toString(mostFit.getState()) + " Score: "
+						+ Arrays.toString(mostFit.getBoardLayout()) + " Score: "
 						+ mostFit.getScore());
 
 				int parentIndexA = new Random().nextInt(population.size());
 				int parentIndexB = new Random().nextInt(population.size() - 1);
 
-				Node parentA = population.remove(parentIndexA);
-				Node parentB = population.remove(parentIndexB);
+				ChessBoard parentA = population.remove(parentIndexA);
+				ChessBoard parentB = population.remove(parentIndexB);
 
 				// Update the population fitness
 				populationFitness -= (parentA.getScore() - parentB.getScore());
 
-				int[] parentStateA = Arrays.copyOf(parentA.getState(),
-						parentA.getState().length);
-				int[] parentStateB = Arrays.copyOf(parentB.getState(),
-						parentB.getState().length);
+				int[] parentStateA = Arrays.copyOf(parentA.getBoardLayout(),
+						parentA.getBoardLayout().length);
+				int[] parentStateB = Arrays.copyOf(parentB.getBoardLayout(),
+						parentB.getBoardLayout().length);
 
 				reproduce(parentStateA, parentStateB);
 				/*
@@ -334,8 +259,8 @@ public class GeneticUtils {
 					System.out.println("SOLUTION FOUND");
 				}
 
-				Node childA = new Node(childScoreA, mutatedChildA);
-				Node childB = new Node(childScoreB, mutatedChildB);
+				ChessBoard childA = new ChessBoard(childScoreA, mutatedChildA);
+				ChessBoard childB = new ChessBoard(childScoreB, mutatedChildB);
 				population.add(childA);
 				population.add(childB);
 				// Update the population fitness
