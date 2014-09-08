@@ -101,7 +101,7 @@ public class HillClimbUtils {
 		 * already.
 		 */
 		List<ChessBoard> successors = new ArrayList<ChessBoard>();
-		ChessBoard parent = new ChessBoard(parentScore, stateCopy);
+		ChessBoard parent = new ChessBoard(stateCopy);
 		successors.add(parent);
 
 		for (int columnIndex = 0; columnIndex < stateCopy.length; columnIndex++) {
@@ -114,7 +114,7 @@ public class HillClimbUtils {
 
 				int stateScore = boardScore(tempState);
 
-				ChessBoard child = new ChessBoard(stateScore, tempState);
+				ChessBoard child = new ChessBoard(tempState);
 				if (!successors.contains(child)) {
 					successors.add(child);
 				}
@@ -172,14 +172,14 @@ public class HillClimbUtils {
 		// Create random initial board to begin with
 		int[] initialState = HillClimbUtils.randomBoard(boardSize);
 		int initialScore = HillClimbUtils.boardScore(initialState);
-		ChessBoard currentNode = new ChessBoard(initialScore, initialState);
+		ChessBoard currentNode = new ChessBoard(initialState);
 
 		while (!done) {
 
 			if (stuckFlag || (plateauCount > PLATEAU_THRESHOLD)) {
 				int[] restartState = HillClimbUtils.randomBoard(boardSize);
 				int restartScore = HillClimbUtils.boardScore(restartState);
-				currentNode = new ChessBoard(restartScore, restartState);
+				currentNode = new ChessBoard(restartState);
 				plateauCount = 0;
 				stuckFlag = false;
 
@@ -202,21 +202,21 @@ public class HillClimbUtils {
 			System.out.println("Iteration " + iterationCount
 					+ ": Current State: "
 					+ Arrays.toString(currentNode.getBoardLayout())
-					+ " Current Score: " + currentNode.getScore()
-					+ " Best Child Score: " + nextNode.getScore());
+					+ " Current Score: " + currentNode.getFitnessScore()
+					+ " Best Child Score: " + nextNode.getFitnessScore());
 
 			// Case where we possibly have a solution, or we are stuck
-			if (nextNode.getScore() > currentNode.getScore()) {
-				if (currentNode.getScore() == 0) {
+			if (nextNode.getFitnessScore() > currentNode.getFitnessScore()) {
+				if (currentNode.getFitnessScore() == 0) {
 					System.out.println("SOLUTION FOUND");
 					done = true;
 				} else {
 					// We have reached a local minima
 					stuckFlag = true;
 				}
-			} else if (nextNode.getScore() < currentNode.getScore()) {
+			} else if (nextNode.getFitnessScore() < currentNode.getFitnessScore()) {
 				// Assign currentNode to nextNode
-				currentNode = new ChessBoard(nextNode.getScore(), nextNode.getBoardLayout());
+				currentNode = new ChessBoard(nextNode.getBoardLayout());
 				// Plateau trend has been broken (if there was one)
 				plateauCount = 0;
 			} else {
@@ -227,13 +227,12 @@ public class HillClimbUtils {
 				 */
 
 				// Assign currentNode to nextNode
-				currentNode = new ChessBoard(nextNode.getScore(), nextNode.getBoardLayout());
+				currentNode = new ChessBoard(nextNode.getBoardLayout());
 				plateauCount++;
 			}
 
 			iterationCount++;
 		}
-
 		return currentNode.getBoardLayout();
 	}
 }

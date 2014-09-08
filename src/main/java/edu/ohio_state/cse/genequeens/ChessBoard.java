@@ -1,11 +1,12 @@
 package edu.ohio_state.cse.genequeens;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 
 /**
- * This class is intended to provide a simple, immutable structure to represent
- * the chess board of the n-queens problem.
+ * This class is intended to provide a simple structure to represent the chess
+ * board of the n-queens problem.
  * 
  * @author Ethan Hill
  * 
@@ -13,22 +14,84 @@ import java.util.Random;
 public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 
 	/**
-	 * the array representation of an n-queens board layout
+	 * The array representation of an n-queens board layout.
 	 */
 	private final int[] boardRep;
 
 	/**
-	 * Constructs an immutable structure for a successor of a particular state,
-	 * holding the value of the passed in score and state of the n-queens board.
-	 * 
-	 * @param score
-	 *            score related to the number of attacking queen pairs on the
-	 *            n-queens board
-	 * @param state
-	 *            the array representation of the n-queens board
+	 * A counter static across all instances, to track how many instances are
+	 * initialized.
 	 */
-	public ChessBoard(int score, int[] state) {
-		this.boardRep = Arrays.copyOf(state, state.length);
+	private static int instanceCount = 0;
+
+	/**
+	 * The unique identifier for {@code this}.
+	 */
+	private final int id;
+
+	/**
+	 * The fixed initial size of {@code this}. Subsequent changes to
+	 * {@code this} cannot change its internal size.
+	 */
+	private final int boardSize;
+
+	/**
+	 * Instantiates a new {@code ChessBoard} with an internal board
+	 * representation of size {@code boardSize}. The internal representation is
+	 * filled with random values to represent the positions of the queens on the
+	 * board.
+	 * 
+	 * @param boardSize
+	 *            The size of the internal board representation.
+	 */
+	public ChessBoard(int boardSize) {
+
+		this.boardSize = boardSize;
+		this.boardRep = new int[boardSize];
+		this.id = instanceCount;
+		instanceCount++;
+			
+		Random rand = new Random();
+		for (int i = 0; i < boardSize; i++) {
+			this.boardRep[i] = rand.nextInt(boardSize);
+		}
+	}
+
+	/**
+	 * Constructs an instance of {@code ChessBoard} with an internal
+	 * representation of a board layout as that of {@code boardRep}.
+	 * 
+	 * @param boardRep
+	 *            The representation of the chess board to construct a new
+	 *            instance of a {@code ChessBoard}.
+	 */
+	public ChessBoard(int[] boardRep) {
+		this.boardSize = boardRep.length;
+		this.boardRep = Arrays.copyOf(boardRep, boardRep.length);
+		this.id = instanceCount;
+		instanceCount++;
+	}
+
+	/**
+	 * Replaces the internal representation of {@code this} to another board
+	 * representation. The new board representation must be the same size of the
+	 * original board representation with which {@code this} was initialized.
+	 * 
+	 * @param boardRep
+	 *            The array representation of the n-queens board.
+	 * @return The original board representation being replaced.
+	 */
+	private int[] replaceBoard(int[] boardRep) {
+		assert boardRep.length == this.boardSize : String.format(
+				"boardRep is not the same size as %s was initialized with",
+				this.toString());
+
+		// Since the boardRep is final, we will manually copy in values
+		for (int i = 0; i < boardRep.length; i++) {
+			this.boardRep[i] = boardRep[i];
+		}
+		int[] oldRep = Arrays.copyOf(this.boardRep, this.boardSize);
+		return oldRep;
 	}
 
 	/**
@@ -54,6 +117,15 @@ public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 	public int[] getBoardLayout() {
 		return Arrays.copyOf(this.boardRep, this.boardRep.length);
 	}
+	
+	/**
+	 * Retrieves the id unique to {@code this} instance.
+	 * 
+	 * @return A unique integer id.
+	 */
+	public int getId(){
+		return this.id;
+	}
 
 	@Override
 	public boolean equals(Object object) {
@@ -64,12 +136,20 @@ public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 		if (!(object instanceof ChessBoard)) {
 			areEqual = false;
 		}
-
-		ChessBoard nodeObject = (ChessBoard) object;
-		if (this.getFitnessScore() != nodeObject.getFitnessScore()) {
+		if (this != object) {
 			areEqual = false;
 		}
-		if (!Arrays.equals(this.boardRep, nodeObject.getBoardLayout())) {
+		ChessBoard boardObject = (ChessBoard) object;
+		if (this.getFitnessScore() != boardObject.getFitnessScore()) {
+			areEqual = false;
+		}
+		if (!Arrays.equals(this.boardRep, boardObject.getBoardLayout())) {
+			areEqual = false;
+		}
+		if (this.boardSize != boardObject.getBoardLayout().length) {
+			areEqual = false;
+		}
+		if (this.id != boardObject.getId()){
 			areEqual = false;
 		}
 		return areEqual;
@@ -112,12 +192,11 @@ public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 		 * pairs we observe.
 		 */
 		int attackingQueenPairCount = 0;
-		for (int columnA = 0; columnA < this.boardRep.length - 1; columnA++) {
-			for (int columnB = columnA + 1; columnB < this.boardRep.length; columnB++) {
+		for (int columnA = 0; columnA < this.boardSize - 1; columnA++) {
+			for (int columnB = columnA + 1; columnB < this.boardSize; columnB++) {
 
 				int rowA = this.boardRep[columnA];
 				int rowB = this.boardRep[columnB];
-
 				float slope = ((float) (rowA - rowB))
 						/ ((float) (columnA - columnB));
 
@@ -130,10 +209,10 @@ public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 		 * We need to now subtract this number of attacking pairs from the total
 		 * number of queen pairs, which is n choose 2. Or n!/(2!*(n-2)!)
 		 */
-		int nChooseTwo = factorial(this.boardRep.length) / factorial(2)
-				* factorial(this.boardRep.length - 2);
-
-		return (double) (nChooseTwo - attackingQueenPairCount);
+		int nChooseTwo = factorial(this.boardSize)
+				/ (factorial(2) * factorial(this.boardSize - 2));
+		this.fitnessScore = (nChooseTwo - attackingQueenPairCount);
+		return this.fitnessScore;
 	}
 
 	/**
@@ -147,22 +226,23 @@ public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 	 */
 	@Override
 	public void mutate(double mutationRate) {
-		for (int i = 0; i < this.boardRep.length; i++) {
+		for (int i = 0; i < this.boardSize; i++) {
 			double probability = new Random().nextDouble();
 			if (probability <= mutationRate) {
-				int mutatedGene = new Random().nextInt(this.boardRep.length);
+				int mutatedGene = new Random().nextInt(this.boardSize);
 				this.boardRep[i] = mutatedGene;
 			}
 		}
 	}
 
 	@Override
-	public void exchangeGenes(Evolvable mate) {
+	public Evolvable exchangeGenes(Evolvable mate) {
 		assert mate instanceof ChessBoard : String.format(
 				"mate %s is of type %s, not of type %s", mate.toString(), mate
 						.getClass().getName(), this.getClass().getName());
+
 		ChessBoard mateBoard = (ChessBoard) mate;
-		assert this.boardRep.length == mateBoard.getBoardLayout().length : String
+		assert this.boardSize == mateBoard.getBoardLayout().length : String
 				.format("individual %s and selected mate %s do not match "
 						+ "length of genetic sequences.\n"
 						+ "individual length: %d\n" + "mate length: %d",
@@ -178,36 +258,61 @@ public class ChessBoard extends Evolvable implements Comparable<Evolvable> {
 		 */
 		int crossOverIndex = new Random().nextInt(this.boardRep.length - 1);
 		int[] childA = new int[this.boardRep.length];
-		int[] childB = new int[mateBoard.boardRep.length];
+		int[] childB = new int[mateBoard.getBoardLayout().length];
 
-		// Fill the child array with the right side of crossover point from
-		// parentA
+		// Fill the children arrays with the right side of crossover point
 		for (int i = 0; i < crossOverIndex; i++) {
-			int gene = this.boardRep[i];
-			childA[i] = gene;
+			int geneA = this.boardRep[i];
+			childA[i] = geneA;
+			int geneB = mateBoard.getBoardLayout()[i];
+			childB[i] = geneB;
 		}
 		// Now fill with left side of crossover point
 		for (int i = crossOverIndex; i < mateBoard.getBoardLayout().length; i++) {
 			int gene = mateBoard.getBoardLayout()[i];
 			childA[i] = gene;
+			int geneB = this.boardRep[i];
+			childB[i] = geneB;
 		}
-		// Fill the other child array with the right side of crossover point
-		// from parentB
-		for (int i = 0; i < crossOverIndex; i++) {
-			int gene = mateBoard.getBoardLayout()[i];
-			childB[i] = gene;
-		}
-		// Now fill with left side of crossover point
-		for (int i = crossOverIndex; i < mateBoard.getBoardLayout().length; i++) {
-			int gene = this.boardRep[i];
-			childB[i] = gene;
-		}
-		
+		this.replaceBoard(childA);
+		Evolvable replacedMate = new ChessBoard(childB);
+		return replacedMate;
 	}
 
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
-		return 0;
+		int result = 37 * this.id;
+		return result + Arrays.hashCode(this.boardRep);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (int columnIndex = 0; columnIndex < this.boardSize; columnIndex++) {
+			builder.append("Queen" + (columnIndex + 1) + ": Row "
+					+ this.boardRep[columnIndex] + " Column " + columnIndex
+					+ "\n");
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * A genetic algorithm attempting to solve the n-queens problem should be
+	 * minimizing an individual's fitness. That is, the number of attacking
+	 * queens should approach zero.
+	 * 
+	 * @author Ethan Hill
+	 *
+	 */
+	public static class QueensGoal implements EvolutionaryGoal {
+		public boolean isSatisfied(Collection<Evolvable> population) {
+			for (Evolvable individual : population) {
+				ChessBoard board = (ChessBoard) individual;
+				if (board.getFitnessScore() == 0) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

@@ -94,20 +94,20 @@ public class GeneticAlgorithms {
 
 		Collection<Evolvable> nextGeneration = new ArrayList<Evolvable>();
 		List<Evolvable> listCopy = new ArrayList<Evolvable>(population);
-
+		// System.out.println(listCopy.size());
 		while (!listCopy.isEmpty()) {
 			// Just pick the top individual from the list
 			Evolvable individual = listCopy.remove(0);
 			Evolvable mate = mateSelector.selectMate(individual, population);
-			if (individual.equals(mate)) {
-				// Add and do nothing, there is no mate for individual
+
+			if (individual == mate) {
 				nextGeneration.add(individual);
 			} else {
 				// Remove the mate from the list
 				listCopy.remove(mate);
 
 				// Perform gene crossover on the two individuals
-				individual.exchangeGenes(mate);
+				mate = individual.exchangeGenes(mate);
 				// Mutate the two resulting individuals
 				individual.mutate(mutationRate);
 				mate.mutate(mutationRate);
@@ -140,10 +140,10 @@ public class GeneticAlgorithms {
 					"population does not contain individual %s",
 					individual.toString());
 			assert !population.isEmpty() : "population is empty";
+
 			if (population.size() == 1) {
 				// No mate exists for the individual
 				return individual;
-
 			} else {
 				/*
 				 * Here we try to simulate sexual selection. Individuals will
@@ -151,17 +151,16 @@ public class GeneticAlgorithms {
 				 * probability, they could pick a random individual as a mate.
 				 */
 				List<Evolvable> list = new ArrayList<Evolvable>(population);
+				Collections.sort(list);
 				Random rand = new Random();
 				int mateIndex;
+				int individualIndex = list.indexOf(individual);
 				if (rand.nextDouble() <= STOCHASTIC_SELECTION_PROBABILITY) {
-					int individualIndex = list.indexOf(individual);
-					mateIndex = rand.nextInt() * (population.size());
+					mateIndex = rand.nextInt(population.size());
 					while (mateIndex == individualIndex) {
-						mateIndex = rand.nextInt() * (population.size());
+						mateIndex = rand.nextInt(population.size());
 					}
 				} else {
-					Collections.sort(list);
-					int individualIndex = list.indexOf(individual);
 					// If individual is last element in list of size > 1,
 					// select mate just before individual
 					if (individualIndex == list.size() - 1) {

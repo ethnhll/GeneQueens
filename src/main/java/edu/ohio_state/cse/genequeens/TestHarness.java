@@ -1,5 +1,10 @@
 package edu.ohio_state.cse.genequeens;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The Main driver class for the Hill Climbing and Genetic search agents,
  * solving the n-queens problem.
@@ -56,14 +61,18 @@ public class TestHarness {
 				System.out.println("\t\tGENETIC SEARCH");
 				System.out
 						.println("--------------------------------------------------------------------------------");
-				int[] solution = GeneticUtils.geneticAlgorithmAgent(
-						commandBoardSize, commandMutationRate,
-						commandPopulationSize);
-
-				for (int columnIndex = 0; columnIndex < solution.length; columnIndex++) {
-					System.out.println("Queen" + (columnIndex + 1) + ": Row "
-							+ solution[columnIndex] + " Column " + columnIndex);
+				// Create a population of boards
+				Collection<Evolvable> population = new ArrayList<Evolvable>();
+				for (int i = 0; i < commandPopulationSize; i++) {
+					Evolvable individual = new ChessBoard(commandBoardSize);
+					population.add(individual);
 				}
+				EvolutionaryGoal nQueensGoal = new ChessBoard.QueensGoal();
+				population = GeneticAlgorithms.evolve(population, nQueensGoal);
+				List<Evolvable> list = new ArrayList<Evolvable>(population);
+				Collections.sort(list);
+				Evolvable solution = list.get(0);
+				System.out.println(solution.toString());
 				System.out
 						.println("--------------------------------------------------------------------------------");
 			} else {

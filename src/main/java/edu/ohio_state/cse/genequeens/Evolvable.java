@@ -72,15 +72,20 @@ public abstract class Evolvable implements Comparable<Evolvable> {
 	/**
 	 * An instance of {@code this} selects a point (or points depending on the
 	 * choice of implementation) at which its genetic sequence is split and
-	 * crossed over with the genetic sequence of {@code mate}.
+	 * crossed over with the genetic sequence of {@code mate}. The internal
+	 * representation of {@code this} is replaced while the internal
+	 * representation of {@code mate} is represented by a new {@code Evolvable}
+	 * individual returned by this function.
 	 * <p>
 	 * {@code mate} must be an instance of the same class as {@code this}.
 	 * 
 	 * @param mate
 	 *            The {@code Evolvable} mate for {@code this} with which
 	 *            {@code this} will exchange genes.
+	 * @return The new individual representing {@code mate}'s new genetic
+	 *         sequence.
 	 */
-	public abstract void exchangeGenes(Evolvable mate);
+	public abstract Evolvable exchangeGenes(Evolvable mate);
 
 	public abstract boolean equals(Object other);
 
