@@ -34,10 +34,10 @@ Eclipse
 -------
 
 This project was developed in [Eclipse](http://www.eclipse.org) (specifically 
-version 4.4 Luna) and can be imported as an Eclipse in a number of ways. If you
-have git integrated with your Eclipse environment, you can simply clone the 
-repository through your favorite git tool and import the project as an existing 
-project.
+version 4.4 Luna) and can be imported as an Eclipse project in a number of 
+ways. If you have git integrated with your Eclipse environment, you can simply 
+clone the repository through your favorite git tool and import the project as 
+an existing project.
 
 
 Version
